@@ -1,1 +1,145 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css"><title>Valuta Cash</title></head><body><div class="app"><header><div><b>Valuta Cash</b><small>Калькулятор обмена валют</small></div></header><nav><button class="tab active" data-tab="online">Онлайн курс</button><button class="tab" data-tab="manual">Мой курс</button></nav><main><section id="online" class="panel active"><div class="card"><label>Меняю</label><div class="row"><input id="amount" type="number" value="100"><select id="from"></select></div><button id="swap">⇅</button><label>Получаю</label><div class="row result"><strong id="result">—</strong><select id="to"></select></div><div class="modes"><button id="buy" class="active">Я продаю валюту</button><button id="sell">Я покупаю валюту</button></div><small id="note"></small></div><div class="card"><div class="head"><b>Источник курса</b><select id="source"><option value="deghest">DEGHEST Центр</option><option value="maib">maib</option><option value="bnm">BNM</option></select></div><small id="updated"></small><div id="rates"></div></div></section><section id="manual" class="panel"><div class="card"><h2>Мой курс</h2><small>Задай любой курс вручную — результат пересчитается сразу.</small><label>Сумма</label><div class="row"><input id="ma" type="number" value="100"><select id="mf"></select></div><div class="manual"><label>Курс: 1 <span id="mfl"></span> =</label><input id="mr" type="number" value="20.50"><span id="mtl"></span></div><label>Получаю</label><div class="row result"><strong id="mres">—</strong><select id="mt"></select></div><div class="quick"><button data-r="20">20</button><button data-r="20.25">20.25</button><button data-r="20.50">20.50</button><button data-r="21">21</button><button data-r="22">22</button></div></div></section></main><footer>Valuta Cash v2 · курс может отличаться в конкретной кассе.</footer></div><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Valuta Cash</title>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>Valuta Cash</h1>
+      <div id="status" class="status">Загрузка курсов…</div>
+    </div>
+    <button id="refreshBtn" class="iconBtn" title="Обновить">↻</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="online">Онлайн курс</button>
+    <button class="tab" data-tab="custom">Мой курс</button>
+  </nav>
+
+  <main>
+    <section id="online" class="panel active">
+      <label>Источник</label>
+      <select id="source">
+        <option value="deghest">DEGHEST — обменник</option>
+        <option value="bank">Банки</option>
+        <option value="maib">MAIB</option>
+        <option value="bnm">BNM — официальный</option>
+      </select>
+
+      <div id="bankBox" class="subbox hidden">
+        <label>Банк</label>
+        <select id="bank">
+          <option value="MAIB">MAIB</option>
+          <option value="Victoriabank">Victoriabank</option>
+          <option value="Moldindconbank">Moldindconbank</option>
+          <option value="OTP Bank Mobiasbanca">OTP Bank</option>
+          <option value="Eximbank">Eximbank</option>
+          <option value="ProCredit Bank">ProCredit Bank</option>
+          <option value="FinComBank">FinComBank</option>
+          <option value="Energbank">Energbank</option>
+          <option value="EuroCreditBank">EuroCreditBank</option>
+        </select>
+      </div>
+
+      <label>Операция</label>
+      <div class="seg">
+        <button class="op active" data-op="sell">Я продаю валюту</button>
+        <button class="op" data-op="buy">Я покупаю валюту</button>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>Отдаю</label>
+          <select id="from"></select>
+        </div>
+        <button id="swap" class="swap">⇄</button>
+        <div>
+          <label>Получаю</label>
+          <select id="to"></select>
+        </div>
+      </div>
+
+      <label>Сумма</label>
+      <input id="amount" type="number" inputmode="decimal" value="100" min="0" step="any">
+
+      <div class="row">
+        <label class="check"><input id="commissionEnabled" type="checkbox"> Комиссия %</label>
+        <input id="commission" class="smallInput" type="number" value="0" min="0" step="0.01">
+      </div>
+
+      <div class="result">
+        <div class="muted">Результат</div>
+        <div id="result" class="big">—</div>
+        <div id="rateLine" class="rate">—</div>
+      </div>
+
+      <div id="sourceInfo" class="sourceInfo">Курсы обновляются автоматически.</div>
+    </section>
+
+    <section id="custom" class="panel">
+      <h2>Мой курс</h2>
+      <p class="muted">Задай любой курс между любыми валютами. Он сохраняется на этом устройстве.</p>
+
+      <div class="grid2">
+        <div>
+          <label>Отдаю</label>
+          <select id="customFrom"></select>
+        </div>
+        <button id="customSwap" class="swap">⇄</button>
+        <div>
+          <label>Получаю</label>
+          <select id="customTo"></select>
+        </div>
+      </div>
+
+      <label>Мой курс</label>
+      <div class="rateInputRow">
+        <span id="customRatePrefix">1 EUR =</span>
+        <input id="customRate" type="number" inputmode="decimal" step="any" placeholder="например 20.15">
+        <span id="customRateSuffix">MDL</span>
+      </div>
+
+      <div class="quick">
+        <button data-rate="20">20</button>
+        <button data-rate="20.15">20.15</button>
+        <button data-rate="20.50">20.50</button>
+        <button data-rate="21">21</button>
+        <button data-rate="22">22</button>
+      </div>
+
+      <label>Сумма</label>
+      <input id="customAmount" type="number" inputmode="decimal" value="100" min="0" step="any">
+
+      <button id="saveCustom" class="primary">Сохранить мой курс</button>
+
+      <div class="result">
+        <div class="muted">Результат</div>
+        <div id="customResult" class="big">—</div>
+        <div id="customRateLine" class="rate">—</div>
+      </div>
+
+      <div class="savedBox">
+        <div class="savedHead">
+          <strong>Сохранённые курсы</strong>
+          <button id="clearCustom" class="textBtn">Очистить</button>
+        </div>
+        <div id="savedRates" class="savedList"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Источники: DEGHEST, MAIB, BNM и банки Молдовы.</div>
+    <div>Курсы банков могут отличаться по отделениям.</div>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
