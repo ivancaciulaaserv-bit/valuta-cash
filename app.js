@@ -1,4 +1,4 @@
-const API_URL = ""; // После публикации Cloudflare Worker вставьте сюда его HTTPS-адрес.
+const API_URL = "https://valuta-cash-api.ivan-caciula-aserv.workers.dev";
 
 const FALLBACK = {
   updated:"2026-10-07",
