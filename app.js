@@ -160,9 +160,15 @@ async function refreshRates(){
   try{
     const r=await fetch(API_URL,{cache:"no-store"});
     if(!r.ok) throw new Error("HTTP "+r.status);
-    const data=await r.json();
-    rates={...rates,...data};
-    localStorage.setItem("vc_rates",JSON.stringify(rates));
+    const data = await r.json();
+
+rates = {
+  ...rates,
+  ...data,
+  maib: data.banks?.["MAIB"] || rates.maib
+};
+
+localStorage.setItem("vc_rates", JSON.stringify(rates));
     $("status").textContent="Курсы обновлены: "+(rates.updated||new Date().toLocaleString("ru-RU"));
   }catch(e){
     $("status").textContent="Нет связи — использую последние сохранённые курсы";
